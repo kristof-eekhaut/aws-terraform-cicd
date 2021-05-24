@@ -1,0 +1,12 @@
+HELP.md
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### Terraform
+.terraform
+.terraform.lock.hcl
+*.tfstate
