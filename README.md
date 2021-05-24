@@ -1,4 +1,5 @@
 ### What this project currently does
+* Create IAM roles for the pipeline and build
 * Set up a CI/CD pipeline in CodePipeline for a Spring Boot project from GitHub (https://github.com/kristof-eekhaut/aws-events-event) 
 * Create a build stage for the pipeline using CodeBuild
 * The build pushes the docker image to the image repository (ECR)
