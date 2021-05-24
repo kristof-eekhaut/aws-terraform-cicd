@@ -1,7 +1,9 @@
 ### What this project currently does
 * Create IAM roles for the pipeline and build
+* Set up Kubernetes cluster on EKS
 * Set up a CI/CD pipeline in CodePipeline for a Spring Boot project from GitHub (https://github.com/kristof-eekhaut/aws-events-event) 
 * Create a build stage for the pipeline using CodeBuild
+* Create Deploy stage to deploy the image to EKS
 * The build pushes the docker image to the image repository (ECR)
 
 ### Prerequisites
@@ -10,6 +12,4 @@
 * An ECR to store the docker images (variable 'image_repository')
 
 ### To Do List
-* Set up Kubernetes cluster on EKS
-* Add Deploy stage to deploy the image to EKS
 * Create pipeline to run the terraform updates automatically when committing changes to GitHub

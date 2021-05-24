@@ -35,12 +35,69 @@ resource "aws_codebuild_project" "events-cicd-build" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://github.com/kristof-eekhaut/aws-events-event.git"
+    type = "GITHUB"
+    location = "https://github.com/kristof-eekhaut/aws-events-event.git"
     git_clone_depth = 1
   }
   source_version = "main"
 }
+
+resource "aws_codebuild_project" "events-cicd-deploy" {
+  name = "events-cicd-deploy"
+  description = "Deploy Events service docker image to EKS"
+  service_role = var.build-role-arn
+
+  concurrent_build_limit = 1
+
+  artifacts {
+    type = "NO_ARTIFACTS"
+  }
+
+  environment {
+    compute_type = "BUILD_GENERAL1_SMALL"
+    image = "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
+    type = "LINUX_CONTAINER"
+    privileged_mode = false
+    image_pull_credentials_type = "CODEBUILD"
+
+    environment_variable {
+      name = "REPO_ECR"
+      value = var.image-repository
+    }
+    environment_variable {
+      name = "REGION"
+      value = var.region
+    }
+    environment_variable {
+      name = "EKS_CLUSTER_NAME"
+      value = var.eks_cluster_name
+    }
+    environment_variable {
+      name = "EKS_NAMESPACE"
+      value = var.eks_namespace
+    }
+    environment_variable {
+      name = "BUILD_ROLE_ARN"
+      value = var.build-role-arn
+    }
+  }
+
+  logs_config {
+    cloudwatch_logs {
+      group_name  = "build"
+      stream_name = "events-service"
+    }
+  }
+
+  source {
+    type = "GITHUB"
+    location = "https://github.com/kristof-eekhaut/aws-events-event.git"
+    git_clone_depth = 1
+    buildspec = "deploy/buildspec.yml"
+  }
+  source_version = "main"
+}
+
 
 resource "aws_codepipeline" "events-cicd-pipeline" {
   name = "events-cicd-pipeline"
@@ -84,6 +141,23 @@ resource "aws_codepipeline" "events-cicd-pipeline" {
 
       configuration = {
         ProjectName = aws_codebuild_project.events-cicd-build.name
+      }
+    }
+  }
+
+  stage {
+    name = "Deploy"
+
+    action {
+      name = "Deploy"
+      category = "Build"
+      owner = "AWS"
+      provider = "CodeBuild"
+      input_artifacts = ["source_output"]
+      version = "1"
+
+      configuration = {
+        ProjectName = aws_codebuild_project.events-cicd-deploy.name
       }
     }
   }

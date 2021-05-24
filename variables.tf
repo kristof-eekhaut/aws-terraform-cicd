@@ -9,3 +9,11 @@ variable codestar_connector_arn {
 variable image_repository {
   type = string
 }
+
+variable eks_cluster_name {
+  type = string
+}
+
+variable eks_namespace {
+  type = string
+}

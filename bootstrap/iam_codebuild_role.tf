@@ -19,7 +19,7 @@ resource "aws_iam_role" "terraform-cicd-build-role" {
 data "aws_iam_policy_document" "terraform-cicd-build-policy-document" {
   statement {
     sid = ""
-    actions = ["logs:*", "s3:*", "codebuild:*", "secretsmanager:*", "ecr:*"]
+    actions = ["logs:*", "s3:*", "codebuild:*", "ecr:*", "eks:*"]
     resources = ["*"]
     effect = "Allow"
   }

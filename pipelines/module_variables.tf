@@ -1,3 +1,7 @@
+variable region {
+  description = "AWS Region"
+}
+
 variable "build-role-arn" {
   description = "Role that runs the build"
 }
@@ -16,4 +20,12 @@ variable "image-repository" {
 
 variable "artifacts-bucket" {
   description = "S3 Bucket to store the build artifacts and cache"
+}
+
+variable "eks_cluster_name" {
+  description = "Name of the Kubernetes Cluster to deploy to"
+}
+
+variable "eks_namespace" {
+  description = "Kubernetes namespace to deploy to"
 }
