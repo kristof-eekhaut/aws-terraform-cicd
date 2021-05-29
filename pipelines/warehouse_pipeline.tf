@@ -1,6 +1,6 @@
-resource "aws_codebuild_project" "events-cicd-build" {
-  name = "events-cicd-build"
-  description = "Build for Events project"
+resource "aws_codebuild_project" "warehouse-cicd-build" {
+  name = "warehouse-cicd-build"
+  description = "Build for Warehouse project"
   service_role = var.build-role-arn
 
   concurrent_build_limit = 1
@@ -30,21 +30,21 @@ resource "aws_codebuild_project" "events-cicd-build" {
   logs_config {
     cloudwatch_logs {
       group_name  = "build"
-      stream_name = "events-service"
+      stream_name = "warehouse-service"
     }
   }
 
   source {
     type = "GITHUB"
-    location = "https://github.com/kristof-eekhaut/aws-events-event.git"
+    location = "https://github.com/kristof-eekhaut/aws-shop-warehouse.git"
     git_clone_depth = 1
   }
   source_version = "main"
 }
 
-resource "aws_codebuild_project" "events-cicd-deploy" {
-  name = "events-cicd-deploy"
-  description = "Deploy Events service docker image to EKS"
+resource "aws_codebuild_project" "warehouse-cicd-deploy" {
+  name = "warehouse-cicd-deploy"
+  description = "Deploy Warehouse service docker image to EKS"
   service_role = var.build-role-arn
 
   concurrent_build_limit = 1
@@ -85,13 +85,13 @@ resource "aws_codebuild_project" "events-cicd-deploy" {
   logs_config {
     cloudwatch_logs {
       group_name  = "build"
-      stream_name = "events-service"
+      stream_name = "warehouse-service"
     }
   }
 
   source {
     type = "GITHUB"
-    location = "https://github.com/kristof-eekhaut/aws-events-event.git"
+    location = "https://github.com/kristof-eekhaut/aws-shop-warehouse.git"
     git_clone_depth = 1
     buildspec = "deploy/buildspec.yml"
   }
@@ -99,8 +99,8 @@ resource "aws_codebuild_project" "events-cicd-deploy" {
 }
 
 
-resource "aws_codepipeline" "events-cicd-pipeline" {
-  name = "events-cicd-pipeline"
+resource "aws_codepipeline" "warehouse-cicd-pipeline" {
+  name = "warehouse-cicd-pipeline"
   role_arn = var.pipeline-role-arn
 
   artifact_store {
@@ -121,7 +121,7 @@ resource "aws_codepipeline" "events-cicd-pipeline" {
 
       configuration = {
         ConnectionArn = var.codestar-connector-arn
-        FullRepositoryId = "kristof-eekhaut/aws-events-event"
+        FullRepositoryId = "kristof-eekhaut/aws-shop-warehouse"
         BranchName = "main"
       }
     }
@@ -140,7 +140,7 @@ resource "aws_codepipeline" "events-cicd-pipeline" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.events-cicd-build.name
+        ProjectName = aws_codebuild_project.warehouse-cicd-build.name
       }
     }
   }
@@ -157,7 +157,7 @@ resource "aws_codepipeline" "events-cicd-pipeline" {
       version = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.events-cicd-deploy.name
+        ProjectName = aws_codebuild_project.warehouse-cicd-deploy.name
       }
     }
   }
